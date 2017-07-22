@@ -4,18 +4,28 @@
 
 #include <Adafruit_NeoPixel.h>
 
+#define USE_FLAME false
 #define NEOPIXEL_PIN 0
 #define BUTTON_PIN 1
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(32, NEOPIXEL_PIN);
 
 #define SLEEP_BRIGHTNESS 13 // maximum brightness in sleep mode
 #define ANIM_DURATION 12000 // 12 seconds on each effect
+
+// Global reusable variables so we don't allocate inside functions and loops
+long rgb[3]; // generic RGB values - long so we can calculate and scale
+uint8_t  i; // generic index
+uint32_t this_color = 0; // temporary color "register" so we can reuse the RAM
+byte acc; // re-usable signed 8-bit "accumulator"
+
+
+
 uint8_t  mode   = 2, // Current animation effect
 // "left" is closes to cpu
          leftOff = 7, // Position of spinny eyes
          rightOff = 2,
          pos = 8;
-uint8_t  i; // generic index
+
 
 uint8_t seen_button_up = 1; //1:button has been up, 0 waiting for up
 uint8_t last_button_state = 0;
@@ -32,51 +42,54 @@ unsigned long button_state_start_time = 0;
 
 
 
-#define NUMBER_OF_FLAMES 5 // depends on number of neopixel triplets. 5 for 16 NeoPixel ring. 4 for 12 NeoPixel ring
-#define FLICKER_CHANCE 3 // increase this to increase the chances an individual flame will flicker
-
 uint32_t rez_range = 256*3;
 
 
 uint8_t testpos = 0;
 uint32_t color  = 0xFF0000; // Start red
-uint32_t this_color = 0; // temporaru color "register" so we can reuse the RAM
 uint32_t prevTime;
 
 int32_t hires_pos = 0, // 256x actual pos so we can fake floats
   inertia = 0,
   moment =0,
   spring_force = 0;
- 
-  
+
+
 #define system_size 8*256
 #define scale2pixel 256
 #define friction  230 // 90% of 256 = 10% drag
 #define spring_constant 92 // 36% of 256
 #define denom 256 // binary fraction time!
 const uint8_t vFlip[] PROGMEM ={
-  0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 
+  0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1,
   0x0, 0xF, 0xE, 0xD, 0xC, 0xB, 0xA, 0x9
 };
 
 const uint8_t brightnessValues[] PROGMEM ={
-  0x00, 0x07, 0x20, 0x40, 0x80, 0xFF 
+  0x00, 0x07, 0x20, 0x40, 0x80, 0xFF
 };
+
+#if USE_FLAME
+
+
+#define NUMBER_OF_FLAMES 5 // depends on number of neopixel triplets. 5 for 16 NeoPixel ring. 4 for 12 NeoPixel ring
+#define FLICKER_CHANCE 3 // increase this to increase the chances an individual flame will flicker
 
 
 struct flame_element{
   int brightness;
   int step;
   int max_brightness;
-  long rgb[3];
+
   byte state;
   } flames[5];
-  
+
   int new_brightness = 0;
   unsigned long rgb[3]; //reusable temporary array
   uint8_t scaleD_rgb[3];
-  byte acc;
- 
+
+ #endif
+
  #define SCALERVAL 256*3
  const int flamecolors[22][3] = {
 { SCALERVAL, 0,  0},
@@ -103,8 +116,8 @@ struct flame_element{
 { SCALERVAL,  SCALERVAL*.3,  SCALERVAL*.5}
 };
 
-  
-  
+
+
 void setup() {
   pinMode(BUTTON_PIN, INPUT); // make this an input
   digitalWrite(BUTTON_PIN, HIGH); // ...with a pullup resistor
@@ -116,32 +129,32 @@ void setup() {
 }
 
 void loop() {
-  
+
   uint32_t t;
   if (brightness_mode == 0){
     hires_pos = hires_pos + inertia;
-    if (hires_pos > SLEEP_BRIGHTNESS){ 
+    if (hires_pos > SLEEP_BRIGHTNESS){
       inertia = -1;
     }
-    if (hires_pos < 1){ 
+    if (hires_pos < 1){
       inertia = 1;
     }
     pixels.setBrightness(hires_pos);
-    
+
     for(i=0; i<32; i=i+2){
       pixels.setPixelColor(i, color);
       pixels.setPixelColor(i+1, 0);
-      
+
     }
     pixels.show();
-    
-    
+
+
     BackgroundDelay(200);
     if (!hires_pos){BackgroundDelay(2400);} // leave it dark for awhile
-    
+
   } else{
     switch(mode) {
-  
+
      case 0: // Random sparks - just one LED on at a time
      // ======================================================
       i = random(32);
@@ -150,11 +163,11 @@ void loop() {
       pixels.show();
       BackgroundDelay(10);
       pixels.setPixelColor(i, 0);
-      
+
       break;
-   
-   
-   
+
+
+
      case 1: // Spinny wheels (4 LEDs on at a time)
     // ======================================================
       for(i=0; i<16; i++) {
@@ -166,15 +179,15 @@ void loop() {
       pixels.show();
       pos = pos++ % 16;
       BackgroundDelay(50);
-     
+
       break;
-      
-      
-      
-      case 2: 
+
+
+
+      case 2:
      // googly
      // ======================================================
-  
+
       inertia = ((inertia -  (hires_pos /3 )) * friction) /denom;
      // inertia = moment;
       hires_pos = hires_pos + inertia;
@@ -188,30 +201,30 @@ void loop() {
         inertia = -inertia;
       }
       // + 8  to rotate 0 to bottom
-     pos = NormalizeRingPos(8+ (hires_pos / scale2pixel)); 
-  
-  
+     pos = NormalizeRingPos(8+ (hires_pos / scale2pixel));
+
+
       for(i=0; i<16; i++) {
         this_color = 0;
-        if(RingDistance(pos, i)<2) this_color = color; 
+        if(RingDistance(pos, i)<2) this_color = color;
         pixels.setPixelColor(    NormalizeRingPos(i+leftOff )  , this_color); // First eye
         pixels.setPixelColor( 16 +NormalizeRingPos(i+rightOff) , this_color); // Second eye (not flipped)
       }
       pixels.show();
-   
+
       BackgroundDelay(24);
-      
+
       // randomly add an impulse:
       if (random(60) == 1){
        inertia = inertia + random(800);
-  
+
       }
-      
-      
+
+
       break;
-     
+
         case 3: // larson scanner:
-    // ====================================================== 
+    // ======================================================
     // actually, just a spinner in this version
         for(i=0; i<16; i++) {
         this_color = 0; // turn off non-selected pixels
@@ -223,12 +236,12 @@ void loop() {
       if (testpos>15){testpos=0;}
       BackgroundDelay(60);
       pixels.show();
-      
+
       break;
-      
+#if USE_FLAME
       case 4: // fire
        InitFlames();
-       
+
       for(byte flame_count=0; flame_count<NUMBER_OF_FLAMES; flame_count++) {
         switch(flames[flame_count].state){
           case 0: // reset
@@ -256,7 +269,7 @@ void loop() {
               // rekindle:
               flames[flame_count].state = 1; //increase again
               flames[flame_count].brightness = max(GetMaxBrightness(), flames[flame_count].brightness);
-              flames[flame_count].step = GetStepSize(); 
+              flames[flame_count].step = GetStepSize();
 
             } else {
               if (new_brightness <1){
@@ -274,8 +287,10 @@ void loop() {
       } // step through flame_count
       pixels.show();
       delay(22);
+      break;
+#endif
     }
-  
+
     t = millis();
     if((t - prevTime) > ANIM_DURATION) {      // Every 8 seconds... change modes
       mode++;                        // Next mode
@@ -310,9 +325,9 @@ void NextColor(){
 }
 
 uint8_t NormalizeRingPos(uint8_t realPos){
-  
+
   while (realPos < 0) { realPos += 16;}
-  while (realPos > 15) { realPos -= 16; }  
+  while (realPos > 15) { realPos -= 16; }
   return realPos;
 }
 
@@ -331,12 +346,12 @@ uint8_t RingDistance(int8_t pos1, int8_t pos2){
    // return a non-continuous value for a color axis
    return random(4)*64;
  }
- 
+
 void BackgroundDelay(unsigned long delay_milliseconds){
   unsigned long now = millis();
   byte current_button_state = (digitalRead(BUTTON_PIN) == LOW);
   while ((now + delay_milliseconds) > millis()){
-    
+
      // debounce
      if (current_button_state == last_button_state){
        if (now - last_button_change > bounce_window){
@@ -357,16 +372,16 @@ void BackgroundDelay(unsigned long delay_milliseconds){
         } else {
           seen_button_up = 1; // button is not down
         }
-         
-         
+
+
        }
-       
+
      } else {
        // restart stability timer:
        last_button_state = current_button_state;
        last_button_change = now;
      }
-         
+
   } // timing while
 }
 /*
@@ -402,7 +417,7 @@ F: 9
 
 
 boolean GetButtonState(){
-// no inputes - everything is global
+// no inputs - everything is global
   boolean retVal = false;
   unsigned long now = millis();
 
@@ -440,24 +455,24 @@ boolean GetButtonState(){
 }
 
 
-
+#if USE_FLAME
 void InitFlames(){
 // Sets initial states in flames array
   for(byte i=0; i<NUMBER_OF_FLAMES; i++) {
     flames[i].state=0;
-    
+
   }
 }
 
 
 void UpdateFlameColor(byte flame_num, int new_brightness){
-// 
+//
   uint32_t c = 0;
   uint32_t color_channel_value;
   byte rgb_channel;
-  
+
   new_brightness = min(new_brightness, flames[flame_num].max_brightness);
-  
+
 
   for(byte rgb_channel=0; rgb_channel<3; rgb_channel++) {
     color_channel_value = flames[flame_num].rgb[rgb_channel];
@@ -477,12 +492,12 @@ void UpdateFlameColor(byte flame_num, int new_brightness){
         acc++;
       }
       scaleD_rgb[i] = acc;
-      
+
     }
     c = pixels.Color(scaleD_rgb[0],scaleD_rgb[1], scaleD_rgb[2]);
     pixels.setPixelColor(flame_num*3 + sub_pixel, c);
   }
-  
+
 }
 
 
@@ -496,7 +511,7 @@ void CreateNewFlame(byte flame_num){
   for(byte i=0; i<3; i++) {
     flames[flame_num].rgb[i] = flamecolors[color_index][i];
   }
- 
+
 }
 
 int GetStepSize(){
@@ -509,3 +524,5 @@ int GetMaxBrightness(){
     retVal = random(rez_range/2) +  rez_range/2; // brighter flat distribution
     return retVal;
 }
+
+#endif
