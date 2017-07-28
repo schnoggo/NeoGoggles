@@ -1,3 +1,10 @@
+/**
+ * Animated google code for the Adafruit neoPixels
+ * Based on https://learn.adafruit.com/kaleidoscope-eyes-neopixel-led-goggles-trinket-gemma/overview?view=all#software
+ * @package neogoggles
+ * @author Lon Koenig <lon@lonk.me>
+ * @license https://opensource.org/licenses/MIT
+ */
 #include <Adafruit_NeoPixel.h>
 #include "neo_goggles.h"
 
@@ -17,7 +24,7 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 
 //Adafruit_NeoPixel pixels = Adafruit_NeoPixel(32, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(32, 0);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS, 0);
 
 
 
@@ -141,9 +148,7 @@ void setup() {
   // set up neopixel ring:
   pixels.begin();
   pixels.setBrightness(80);
-  ClearRings();
-  SolidRing(0x222222);
-  pixels.show();
+  SolidRing(0x222222, true);
   delay(500);
 
   dprintln("Solid called");

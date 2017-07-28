@@ -1,5 +1,20 @@
+/**
+ * Functions to animate the neoPixel LED strips/rings
+ * @package neogoggles
+ * @author Lon Koenig <lon@lonk.me>
+ * @license https://opensource.org/licenses/MIT
+ */
+
+/**
+ * Begin an animation by calling StartAnimation()
+ * Update display by calling UpdateAnimation()
+ *
+ * Animation IDs are defined in neo_goggles.h
+ *
+ * @param uint8_t which_animation ID of the animation
+ */
 void StartAnimation(uint8_t which_animation){
-  // globals
+  // globals:
   // animation_frame
   // current_animation
   // pixels_dirty
@@ -9,12 +24,15 @@ void StartAnimation(uint8_t which_animation){
   dprint("StartAnimation:")
   dprintln(which_animation);
   if (SOLID_ANIM == which_animation){
-    SolidRing(0x222222);
+    SolidRing(0x222222, true);
 
   }
 }
 
-
+/**
+ * Background update function to draw
+ * next frame of current animation
+ */
 void UpdateAnimation(){
 // globals
 // current_animation
@@ -26,7 +44,7 @@ switch(current_animation) {
 
  case SPARKS_ANIM: // Random sparks - just one LED on at a time
  // ======================================================
-  i = random(32);
+  i = random(MAX_PIXELS);
  // pixels.setPixelColor(i, animation_color);
  pixels.setPixelColor(i, pixels.Color(SteppedColor(), SteppedColor(), SteppedColor() ));
   pixels.show();
@@ -146,7 +164,7 @@ switch(current_animation) {
   case HALF_BLINK_ANIM:
 
 
-  for(i=0; i<32; i=i+1){ // light every other pixel
+  for(i=0; i<MAX_PIXELS; i=i+1){ // light every other pixel
       if ((i%2) == (byte) animation_frame ){
     pixels.setPixelColor(i, animation_color);
 
@@ -229,19 +247,21 @@ switch(current_animation) {
 
 
 
-void ClearRings(){
-    SolidRing(0);
+void ClearRings(boolean show){
+    SolidRing(0, show);
 }
 
-void SolidRing(uint32_t c){
-    for(i=0; i<32; i++) pixels.setPixelColor(i, c);
-    pixels.show();
+void SolidRing(uint32_t c, boolean show){
+    for(i=0; i<MAX_PIXELS; i++) pixels.setPixelColor(i, c);
+    if (show){
+      pixels.show();
+    }
 }
 
 void FlashRing(){
-  SolidRing(0x222222);
+  SolidRing(0x222222, true);
   BackgroundDelay(100);
-  SolidRing(0);
+  SolidRing(0, true);
 }
 
 void NextColor(){
