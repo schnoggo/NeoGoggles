@@ -47,10 +47,13 @@ switch(current_animation) {
 case COMET_ANIM:
   // streak around the ring with current color
   ClearRings(false);
-  DrawRingPixel(animation_frame, animation_color, false);
+  for(uint8_t fade_level=0; fade_level<5; fade_level++){
+  //  DrawRingPixel(animation_frame, animation_color, false);
+    DrawRingPixel(animation_frame - fade_level , FadedColor(fade_level), false);
+  }
   if ((++animation_frame)>15) {animation_frame = 0;}
 
-  frame_duration = 1000;
+  frame_duration = 40;
   pixels_dirty =  true;
 break;
 
@@ -334,11 +337,20 @@ void FlashRing(){
   SolidRing(0, true);
 }
 
+void SetAnimationColor(uint32_t new_color){
+    dprint("SetAnimationColor: ");
+      dprintln(new_color);
+  animation_color = new_color; // set the global single color
+  CreateFadeValues(new_color); // set faded colors table
+
+}
 void NextColor(){
   // globals:
   // animation_color
+
         animation_color >>= 8;                 // Next color R->G->B
       if(!animation_color) animation_color = 0xFF0000; // Reset to red
+        SetAnimationColor(animation_color); // yes redundant right now
 }
 
 uint8_t NormalizeRingPos(uint8_t realPos){
@@ -363,3 +375,49 @@ uint8_t RingDistance(int8_t pos1, int8_t pos2){
    // return a non-continuous value for a color axis
    return random(4)*64;
  }
+
+ /**
+  * @param uint8_t offset into color table
+  */
+ uint32_t FadedColor(uint8_t fade_amount){
+   // globals:
+   //palette -- array of colors
+   return palette[fade_amount];
+ }
+
+/**
+ * initialize the color palette for fade effects
+ * @param uint32_t start_color Brightest color to fade down from
+ */
+ void CreateFadeValues(uint32_t start_color){
+  // globals:
+  //palette -- array of colors
+  uint32_t calc_color = 0;
+  uint8_t rgb[3];
+  uint8_t channel;
+  int channel_value;
+
+  // split up original color into channels
+  rgb[0] = (uint8_t)(start_color >> 0);
+  rgb[1] = (uint8_t)(start_color >> 8);
+  rgb[2] = (uint8_t)(start_color >> 16);
+
+  // fill in palette with faded values:
+  for(i=0; i<FADE_LENGTH; i++){
+      dprint("i: ");
+      dprint(i);
+      dprint(",   ");
+    palette[i] = pixels.Color(rgb[0], rgb[1], rgb[2]); // base color on current split-up color channels
+    // now fade it for next slot in array:
+    for(channel=0; channel<3; channel++){ // step through RGB channels
+      dprint(channel);
+      dprint(": ");
+      channel_value = rgb[channel]; // copy it to an int for bigger math
+      rgb[channel] = (channel_value * 40) /  100;
+      dprint(rgb[channel]);
+      dprint(",  ");
+    }
+
+  dprintln();
+  }
+}

@@ -50,6 +50,7 @@ uint8_t  mode   = 2, // Current animation effect
 uint8_t current_animation = 1;
 uint32_t animation_frame = 0;
 uint32_t animation_color  = 0xFF0000; // Start red
+uint32_t palette[FADE_LENGTH + 1]; // array of color for animations (fades)
 boolean pixels_dirty =  true;
 
 uint8_t seen_button_up = 1; //1:button has been up, 0 waiting for up
@@ -149,6 +150,7 @@ void setup() {
   // set up neopixel ring:
   pixels.begin();
   pixels.setBrightness(80);
+  SetAnimationColor(0x00FF00);
   SolidRing(0x222222, true);
   delay(500);
 

@@ -20,6 +20,8 @@
 #define SOLID_ANIM 6
 #define COMET_ANIM 7
 
+// other animation Constants:
+#define FADE_LENGTH 5
 
 #define PRDBG
 // macros:
