@@ -9,12 +9,13 @@
 #include "neo_goggles.h"
 
 #define USE_FLAME false
+
+#define BUTTON_PIN 1
 #define SWITCH_STYLE VIBRATION
 // Switch styles will be MOMENTARY | VIBRATION
 
 
-#define NEOPIXEL_PIN 3
-#define BUTTON_PIN 1
+// ---------------- set up NeoPixels ---------------
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
@@ -24,7 +25,7 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 
 //Adafruit_NeoPixel pixels = Adafruit_NeoPixel(32, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS, 0);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 
 
@@ -152,7 +153,7 @@ void setup() {
   delay(500);
 
   dprintln("Solid called");
-    StartAnimation(HALF_BLINK_ANIM);
+    StartAnimation(COMET_ANIM); //SPARKS_ANIM); //COMET_ANIM);
 /*
   pinMode(BUTTON_PIN, INPUT); // make this an input
   digitalWrite(BUTTON_PIN, HIGH); // ...with a pullup resistor

@@ -8,7 +8,7 @@
 // Describe the hardware:
 #define RING_SIZE 16
 #define MAX_PIXELS RING_SIZE*2
-
+#define NEOPIXEL_PIN 8
 
 // NeoPixel Ring Animations:
 #define SPARKS_ANIM 0
@@ -18,9 +18,10 @@
 #define HALF_BLINK_ANIM 4
 #define FLASH_ANIM 5
 #define SOLID_ANIM 6
+#define COMET_ANIM 7
 
 
-//#define PRDBG
+#define PRDBG
 // macros:
 // create Serial.print macros:
 #ifdef PRDBG

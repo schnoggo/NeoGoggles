@@ -37,20 +37,34 @@ void UpdateAnimation(){
 // globals
 // current_animation
 // animation_frame
+// animation_color
 
 uint16_t frame_duration = 200;
 
 switch(current_animation) {
 
+
+case COMET_ANIM:
+  // streak around the ring with current color
+  ClearRings(false);
+  DrawRingPixel(animation_frame, animation_color, false);
+  if ((++animation_frame)>15) {animation_frame = 0;}
+
+  frame_duration = 1000;
+  pixels_dirty =  true;
+break;
+
+
  case SPARKS_ANIM: // Random sparks - just one LED on at a time
  // ======================================================
   i = random(MAX_PIXELS);
  // pixels.setPixelColor(i, animation_color);
- pixels.setPixelColor(i, pixels.Color(SteppedColor(), SteppedColor(), SteppedColor() ));
+  pixels.setPixelColor(i, pixels.Color(SteppedColor(), SteppedColor(), SteppedColor() ));
   pixels.show();
   BackgroundDelay(10);
   pixels.setPixelColor(i, 0);
-
+  frame_duration = 0;
+  pixels_dirty =  false;
   break;
 
   case FLASH_ANIM:
@@ -244,13 +258,69 @@ switch(current_animation) {
   }
 }
 
+/**
+ * Light an LED at specicied location on both eyes
+ * acccounting for rotation, offsets and reflection
+ *
+ * @param uint8_t position which pixel to light up
+ * @param uint32_t this_color color of pixel
+ * @param boolean reflection true = mirror to other eye. False copy to other eye
+ */
+void DrawRingPixel(uint8_t position, uint32_t this_color,  boolean reflection){
+  // globals:
+
+  pixels.setPixelColor( OffsetLeftPos(position) , this_color); // left eye
+  if (reflection){
+      pixels.setPixelColor( OffsetRightPos(position) , this_color); // right eye
+  } else {
+    pixels.setPixelColor( OffsetRightPos(position) , this_color); // right eye
+  }
+
+}
+
+/**
+ * Convert virtual pixel position to real-world hardware position
+ *
+ * @param uint8_t v_pos current (virtual) position
+ *
+ * @return uint8_t translated pixel position in neoPixel strip
+ */
+uint8_t OffsetLeftPos(uint8_t v_pos){
+  // globals:
+  // leftOff position of "top" on the physical neoPixel ring
+   return (NormalizeRingPos( v_pos + leftOff));
+}
+
+/**
+ * Convert virtual pixel position to real-world hardware position
+ *
+ * @param uint8_t v_pos current (virtual) position
+ *
+ * @return uint8_t translated pixel position in neoPixel strip
+ */
+uint8_t OffsetRightPos(uint8_t v_pos){
+  // globals:
+  // rightOff position of "top" on the physical neoPixel ring
+   return (RING_SIZE + NormalizeRingPos( v_pos + rightOff));
+}
 
 
+// leftOff position of
 
+
+/**
+ * Turn all the LEDs off
+ * @param boolean show true = display immediately. false = don't call show()
+ */
 void ClearRings(boolean show){
     SolidRing(0, show);
 }
 
+/**
+ * Turn all the LEDs same color
+ * @param uint32_t c packed 32-bit color for neoPixel library
+ * @param boolean show true = display immediately. false = don't call show()
+ */
 void SolidRing(uint32_t c, boolean show){
     for(i=0; i<MAX_PIXELS; i++) pixels.setPixelColor(i, c);
     if (show){
