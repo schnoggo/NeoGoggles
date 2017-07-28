@@ -49,7 +49,7 @@ case COMET_ANIM:
   ClearRings(false);
   for(uint8_t fade_level=0; fade_level<5; fade_level++){
   //  DrawRingPixel(animation_frame, animation_color, false);
-    DrawRingPixel(animation_frame - fade_level , FadedColor(fade_level), false);
+    DrawRingPixel(animation_frame - fade_level , FadedColor(fade_level), true);
   }
   if ((++animation_frame)>15) {animation_frame = 0;}
 
@@ -274,7 +274,7 @@ void DrawRingPixel(uint8_t position, uint32_t this_color,  boolean reflection){
 
   pixels.setPixelColor( OffsetLeftPos(position) , this_color); // left eye
   if (reflection){
-      pixels.setPixelColor( OffsetRightPos(position) , this_color); // right eye
+      pixels.setPixelColor(  OffsetRightPos((RING_SIZE - position)) , this_color); // right eye
   } else {
     pixels.setPixelColor( OffsetRightPos(position) , this_color); // right eye
   }
