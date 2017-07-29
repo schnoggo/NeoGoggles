@@ -49,10 +49,9 @@ case COMET_ANIM:
   ClearRings(false);
   for(uint8_t fade_level=0; fade_level<5; fade_level++){
   //  DrawRingPixel(animation_frame, animation_color, false);
-    DrawRingPixel(animation_frame - fade_level , FadedColor(fade_level), true);
+    DrawRingPixel(animation_frame - fade_level , FadedColor(fade_level), true, 2);
   }
   if ((++animation_frame)>15) {animation_frame = 0;}
-
   frame_duration = 40;
   pixels_dirty =  true;
 break;
@@ -88,8 +87,17 @@ break;
 
  case SPINNY_ANIM: // Spinny wheels (4 LEDs on at a time)
 // ======================================================
+  ClearRings(false);
+  DrawRingPixel(animation_frame  , FadedColor(0), true, 4);
+  DrawRingPixel(animation_frame - 1 , FadedColor(2), true, 4);
+  DrawRingPixel(animation_frame +1 , FadedColor(2), true, 4);
 
+  if ((++animation_frame)>3) {animation_frame = 0;}
+  frame_duration = 80;
+  pixels_dirty =  true;
+break;
 
+/*
   for(i=0; i<8; i++) { //count around the ring of pixels
     this_color = 0; // turn off non-selected pixels
       if(
@@ -120,7 +128,7 @@ break;
     pixels_dirty =  true;
   break;
 
-
+*/
 
   case GOOGLY_ANIM:
  // googly
@@ -268,15 +276,21 @@ break;
  * @param uint8_t position which pixel to light up
  * @param uint32_t this_color color of pixel
  * @param boolean reflection true = mirror to other eye. False copy to other eye
+ * @param multiple how many times to draw (recommended values: 1, 2, 3)
  */
-void DrawRingPixel(uint8_t position, uint32_t this_color,  boolean reflection){
+void DrawRingPixel(uint8_t position, uint32_t this_color,  boolean reflection, uint8_t multiple){
   // globals:
-
-  pixels.setPixelColor( OffsetLeftPos(position) , this_color); // left eye
-  if (reflection){
-      pixels.setPixelColor(  OffsetRightPos((RING_SIZE - position)) , this_color); // right eye
-  } else {
-    pixels.setPixelColor( OffsetRightPos(position) , this_color); // right eye
+  uint8_t delta = RING_SIZE/multiple;
+  uint8_t clone_count;
+  uint8_t clone_position;
+  for(clone_count = 0; clone_count < MAX_PIXELS; clone_count++){
+    clone_position = position + clone_count * delta;
+    pixels.setPixelColor( OffsetLeftPos(clone_position) , this_color); // left eye
+    if (reflection){
+        pixels.setPixelColor(  OffsetRightPos((RING_SIZE - clone_position)) , this_color); // right eye
+    } else {
+      pixels.setPixelColor( OffsetRightPos(clone_position) , this_color); // right eye
+    }
   }
 
 }

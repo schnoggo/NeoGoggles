@@ -155,7 +155,7 @@ void setup() {
   delay(500);
 
   dprintln("Solid called");
-    StartAnimation(COMET_ANIM); //SPARKS_ANIM); //COMET_ANIM);
+    StartAnimation(SPINNY_ANIM); //SPARKS_ANIM); //COMET_ANIM);
 /*
   pinMode(BUTTON_PIN, INPUT); // make this an input
   digitalWrite(BUTTON_PIN, HIGH); // ...with a pullup resistor
