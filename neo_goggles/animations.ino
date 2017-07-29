@@ -49,7 +49,7 @@ void UpdateAnimation(){
 // animation_color
 
 uint16_t frame_duration = 200;
-
+uint8_t delta = 0;
 switch(current_animation) {
 
 
@@ -129,11 +129,12 @@ break;
   ClearRings(false);
   for(i=0; i<RING_SIZE; i++) {
     this_color = 0;
-    if(RingDistance(ring_pos, i)<2){
+    delta = RingDistance(ring_pos, i);
+    if(delta <2 ){
       //  pixels.setPixelColor(    NormalizeRingPos(i+leftOff )  , this_color); // First eye
       //  pixels.setPixelColor( 16 +NormalizeRingPos(i+rightOff) , this_color); // Second eye (not flipped)
     // replace ^
-        DrawRingPixel(i  , FadedColor(0), false, 1);
+        DrawRingPixel(i  , FadedColor(1 + delta * 2 ), false, 1);
     }
   }
   frame_duration = 24;
