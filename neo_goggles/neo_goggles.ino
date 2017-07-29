@@ -7,12 +7,6 @@
  */
 #include <Adafruit_NeoPixel.h>
 #include "neo_goggles.h"
-
-#define USE_FLAME false
-
-
-
-
 // ---------------- set up NeoPixels ---------------
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -45,6 +39,9 @@ uint8_t  mode   = 2, // Current animation effect
          rightOff = 2;
 
 uint8_t animation_pool[] {
+#if USE_FLAME
+FLAME_ANIM,
+#endif
 SPARKS_ANIM,
 SPINNY_ANIM,
 GOOGLY_ANIM,
@@ -52,6 +49,7 @@ LARSON_SCANNER,
 HALF_BLINK_ANIM,
 FLASH_ANIM,
 COMET_ANIM,
+
 };
 uint8_t current_animation = 1;
 uint32_t animation_frame = 0;
@@ -65,22 +63,18 @@ uint32_t last_button_change = 0;
 #define bounce_window 12 //  milliseconds to count as stable
 uint8_t brightness_mode = 3; //0-5 levels of brightness. 0 = pulse (sleep) mode
 
-
-uint8_t button_state = 0;
+uint8_t hardware_button_state = 0;
 uint8_t prev_button_state = 0xFF;
-uint8_t button_seen_up = 0;
+boolean button_seen_up = false;
 unsigned long button_state_start_time = 0;
-#define BUTTON_BOUNCE_TIME 80
+#define BUTTON_BOUNCE_TIME 30
 
+boolean current_button_state = false;
 
 
 uint32_t rez_range = 256*3;
-
-
 uint8_t testpos = 0;
-
 uint32_t nextModeChange;
-
 int32_t hires_pos = 0, // 256x actual pos so we can fake floats
   inertia = 0,
   moment =0,
@@ -92,10 +86,10 @@ int32_t hires_pos = 0, // 256x actual pos so we can fake floats
 #define friction  230 // 90% of 256 = 10% drag
 #define spring_constant 92 // 36% of 256
 #define denom 256 // binary fraction time!
-const uint8_t vFlip[] PROGMEM ={
+const uint8_t vFlip[]{
   0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1,
   0x0, 0xF, 0xE, 0xD, 0xC, 0xB, 0xA, 0x9
-};
+}; //hard-coded for 16 pixel rings
 
 const uint8_t brightnessValues[] PROGMEM ={
   0x00, 0x07, 0x20, 0x40, 0x80, 0xFF
@@ -109,12 +103,11 @@ struct flame_element{
   int brightness;
   int step;
   int max_brightness;
-
+  long rgb[3];
   byte state;
   } flames[5];
 
   int new_brightness = 0;
-  unsigned long rgb[3]; //reusable temporary array
   uint8_t scaleD_rgb[3];
 
 #endif
@@ -177,13 +170,6 @@ void setup() {
 void loop() {
   unsigned long now = millis();
 
-  if (GetButtonState()) {
-    SolidRing(0x222222, true);
-    delay(130);
-    SolidRing(0, true);
-    nextModeChange =  now; // immediately jump to next mode
-  }
-
 
   if((now > nextModeChange) ) {      // Every 8 seconds... change modes
     mode++;                        // Next mode
@@ -192,68 +178,23 @@ void loop() {
     nextModeChange = now + ANIM_DURATION;
     StartAnimation(animation_pool[mode]);
   }
-
     UpdateAnimation();
 }
 
 // Replace regular delay() with somethat can run background process
 void BackgroundDelay(unsigned long delay_milliseconds){
-  // globals:
-  // last_button_change - time
-  // bounce_window -- time
-  // seen_button_up
-  // last_button_state
-
-  unsigned long now = millis();
-
-  #if SWITCH_STYLE == VIBRATION
-  byte current_button_state = (digitalRead(BUTTON_PIN));
+    unsigned long now = millis();
     while ((now + delay_milliseconds) > millis()){
-    if (  current_button_state) {
-      last_button_state =  true;
+      UpdateButtonState();
+      if (GetButtonState()){
+        SolidRing(0x2222FF, true);
+        delay(130);
+        SolidRing(0, true);
+        nextModeChange = now; // immediately jump to next mode
+
+      }
+
     }
-    } // timing while
-  #else
-
-  byte current_button_state = (digitalRead(BUTTON_PIN) == LOW);
-  while ((now + delay_milliseconds) > millis()){
-
-
-
-     // debounce
-     if (current_button_state == last_button_state){
-       if (now - last_button_change > bounce_window){
-         // stable:
-         if (current_button_state) { // button down
-          if (seen_button_up){ // button is pushed and we've seen it up
-            brightness_mode = (brightness_mode+1)%5;
-            seen_button_up = 0; // mark that we've seen this button press
-           // pixels.setBrightness(32*brightness_mode);
-           pixels.setBrightness(pgm_read_byte_near(brightnessValues+brightness_mode));
-           if (!brightness_mode){
-             // we're in sleep mode: initialize for that mode
-             inertia = 1;
-             hires_pos = 0;
-             animation_color = 0x00FFFF;
-           } // init sleep mode
-          } // seen_button_up
-        } else {
-          seen_button_up = 1; // button is not down
-        }
-
-
-       }
-
-     } else {
-       // restart stability timer:
-       last_button_state = current_button_state;
-       last_button_change = now;
-     }
-
-  } // timing while
-
-  #endif
-
 }
 
 /*

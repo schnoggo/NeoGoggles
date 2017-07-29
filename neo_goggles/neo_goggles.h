@@ -5,14 +5,21 @@
  * @license https://opensource.org/licenses/MIT
  */
 
+// code compile-time options:
+#define MOMENTARY 1
+#define VIBRATION 2
+#define SWITCH_STYLE MOMENTARY
+// Switch styles will be MOMENTARY | VIBRATION (Don't use 0 for definitions)
+#define USE_FLAME true
+// if true, compile in the flame effect
+
 // Describe the hardware:
 #define RING_SIZE 16
 #define MAX_PIXELS RING_SIZE*2
 #define NEOPIXEL_PIN 8
 
 #define BUTTON_PIN 3
-#define SWITCH_STYLE MOMENTARY
-// Switch styles will be MOMENTARY | VIBRATION
+
 //
 
 // NeoPixel Ring Animations:
@@ -24,6 +31,7 @@
 #define FLASH_ANIM 5
 #define SOLID_ANIM 6
 #define COMET_ANIM 7
+#define FLAME_ANIM 99
 
 // other animation Constants:
 #define FADE_LENGTH 5

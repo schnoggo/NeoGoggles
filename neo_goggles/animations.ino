@@ -23,8 +23,17 @@ void StartAnimation(uint8_t which_animation){
   pixels_dirty = true;
   dprint("StartAnimation:")
   dprintln(which_animation);
-  if (SOLID_ANIM == which_animation){
+
+  switch (which_animation){
+    case SPARKS_ANIM:
+
+    break;
+
+    case SOLID_ANIM:
     SolidRing(0x222222, true);
+  }
+  if (SOLID_ANIM == which_animation){
+
 
   }
 }
@@ -210,7 +219,7 @@ break;
   break;
 
 #if USE_FLAME
-  case FIRE_ANIM: // fire
+  case FLAME_ANIM: // fire
    InitFlames();
 
   for(byte flame_count=0; flame_count<NUMBER_OF_FLAMES; flame_count++) {
