@@ -126,17 +126,20 @@ break;
   // + 8  to rotate 0 to bottom
  ring_pos = NormalizeRingPos(8+ (hires_pos / scale2pixel));
 
-
-  for(i=0; i<16; i++) {
+  ClearRings(false);
+  for(i=0; i<RING_SIZE; i++) {
     this_color = 0;
-    if(RingDistance(ring_pos, i)<2) this_color = animation_color;
-    pixels.setPixelColor(    NormalizeRingPos(i+leftOff )  , this_color); // First eye
-    pixels.setPixelColor( 16 +NormalizeRingPos(i+rightOff) , this_color); // Second eye (not flipped)
+    if(RingDistance(ring_pos, i)<2){
+      //  pixels.setPixelColor(    NormalizeRingPos(i+leftOff )  , this_color); // First eye
+      //  pixels.setPixelColor( 16 +NormalizeRingPos(i+rightOff) , this_color); // Second eye (not flipped)
+    // replace ^
+        DrawRingPixel(i  , FadedColor(0), false, 1);
+    }
   }
-  pixels.show();
+  frame_duration = 24;
+  pixels_dirty =  true;
 
-  BackgroundDelay(24);
-
+  // if inertia settles to low level goose it. --todo
   // randomly add an impulse:
   if (random(60) == 1){
    inertia = inertia + random(800);
@@ -254,14 +257,14 @@ break;
  * @param uint8_t position which pixel to light up
  * @param uint32_t this_color color of pixel
  * @param boolean reflection true = mirror to other eye. False copy to other eye
- * @param multiple how many times to draw (recommended values: 1, 2, 3)
+ * @param multiple how many times to draw (recommended values: 1, 2, 4, 8)
  */
 void DrawRingPixel(uint8_t position, uint32_t this_color,  boolean reflection, uint8_t multiple){
   // globals:
   uint8_t delta = RING_SIZE/multiple;
   uint8_t clone_count;
   uint8_t clone_position;
-  for(clone_count = 0; clone_count < MAX_PIXELS; clone_count++){
+  for(clone_count = 0; clone_count < multiple; clone_count++){
     clone_position = position + clone_count * delta;
     pixels.setPixelColor( OffsetLeftPos(clone_position) , this_color); // left eye
     if (reflection){

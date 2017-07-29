@@ -33,8 +33,8 @@ byte acc; // re-usable signed 8-bit "accumulator"
 
 
 
-uint8_t  mode   = 2, // Current animation effect
-// "left" is closes to cpu
+uint8_t  mode   = 0, // Current animation effect
+// "left" is closest to cpu
          leftOff = 7, // Position of spinny eyes
          rightOff = 2;
 
@@ -42,13 +42,14 @@ uint8_t animation_pool[] {
 #if USE_FLAME
 FLAME_ANIM,
 #endif
-SPARKS_ANIM,
-SPINNY_ANIM,
+//SPARKS_ANIM,
+ SPINNY_ANIM,
 GOOGLY_ANIM,
-LARSON_SCANNER,
-HALF_BLINK_ANIM,
-FLASH_ANIM,
 COMET_ANIM,
+// LARSON_SCANNER,
+//HALF_BLINK_ANIM,
+//FLASH_ANIM,
+
 
 };
 uint8_t current_animation = 1;
@@ -154,7 +155,7 @@ void setup() {
   delay(500);
 
   dprintln("Solid called");
-    StartAnimation(SPINNY_ANIM); //SPARKS_ANIM); //COMET_ANIM);
+    StartAnimation(animation_pool[0]); // first animation in animation pool
 /*
   pinMode(BUTTON_PIN, INPUT); // make this an input
   digitalWrite(BUTTON_PIN, HIGH); // ...with a pullup resistor
@@ -173,9 +174,11 @@ void loop() {
 
   if((now > nextModeChange) ) {      // Every 8 seconds... change modes
     mode++;                        // Next mode
-    if(mode > sizeof( animation_pool)) {       mode = 0;}                // End of modes?
+    if(mode >= sizeof( animation_pool)) { mode = 0;} // End of available animations?
     NextColor(); // change to randomly pick a color
     nextModeChange = now + ANIM_DURATION;
+    dprint("new mode: ");
+    dprintln(mode);
     StartAnimation(animation_pool[mode]);
   }
     UpdateAnimation();
