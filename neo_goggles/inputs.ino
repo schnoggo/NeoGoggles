@@ -63,7 +63,7 @@ unsigned long now = millis();
    boolean retVal = false;
 
    if (current_button_state){
-    retVal = false;
+    retVal = true;
     ClearButtonState();
    }
    return retVal;

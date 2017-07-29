@@ -94,50 +94,18 @@ break;
   break;
 
 
- case SPINNY_ANIM: // Spinny wheels (4 LEDs on at a time)
-// ======================================================
-  ClearRings(false);
-  DrawRingPixel(animation_frame  , FadedColor(0), true, 4);
-  DrawRingPixel(animation_frame - 1 , FadedColor(2), true, 4);
-  DrawRingPixel(animation_frame +1 , FadedColor(2), true, 4);
+  case SPINNY_ANIM: // Spinny wheels (4 LEDs on at a time)
+  // ======================================================
+    ClearRings(false);
+    DrawRingPixel(animation_frame  , FadedColor(0), true, 4);
+    DrawRingPixel(animation_frame - 1 , FadedColor(2), true, 4);
+    DrawRingPixel(animation_frame +1 , FadedColor(2), true, 4);
 
-  if ((++animation_frame)>3) {animation_frame = 0;}
-  frame_duration = 80;
-  pixels_dirty =  true;
-break;
-
-/*
-  for(i=0; i<8; i++) { //count around the ring of pixels
-    this_color = 0; // turn off non-selected pixels
-      if(
-
-       (i == NormalizeRingPos(animation_frame))
-       or
-       (i == NormalizeRingPos(animation_frame + 1) )
-       or
-       (i == NormalizeRingPos(animation_frame+8))
-       or
-       (i == NormalizeRingPos(animation_frame + 1 + 8) )
-      ){
-        this_color = animation_color;
-      }
-
-
-//    if(((animation_frame + i) & 7) < 2) {this_color = animation_color;} // 4 pixels on...
-
-    pixels.setPixelColor(  NormalizeRingPos(i+leftOff), this_color); // First eye
-    pixels.setPixelColor(  NormalizeRingPos(i+leftOff + 8), this_color); // First eye
-
-    pixels.setPixelColor(16 + NormalizeRingPos(16-i+rightOff)  , this_color); // Second eye (flipped)
-  }
-
-  //animation_frame = animation_frame++ % 16;
-  if ((++animation_frame)>15) {animation_frame = 0;}
-    frame_duration = 60;
+    if ((++animation_frame)>3) {animation_frame = 0;}
+    frame_duration = 80;
     pixels_dirty =  true;
   break;
 
-*/
 
   case GOOGLY_ANIM:
  // googly
@@ -213,7 +181,7 @@ break;
       animation_frame =1;
     }
 
-      frame_duration = 1000;
+      frame_duration = 200;
       pixels_dirty =  true;
   }
   break;
@@ -265,12 +233,13 @@ break;
     }
 
   } // step through flame_count
-  pixels.show();
-  delay(22);
+  frame_duration = 22;
+  pixels_dirty =  true;
+
   break;
 #endif
 } // end the big switch
-  delay(frame_duration);
+  BackgroundDelay(frame_duration);
   //BackgroundDelay
   if (pixels_dirty){
     pixels.show();
