@@ -10,9 +10,7 @@
 
 #define USE_FLAME false
 
-#define BUTTON_PIN 1
-#define SWITCH_STYLE VIBRATION
-// Switch styles will be MOMENTARY | VIBRATION
+
 
 
 // ---------------- set up NeoPixels ---------------
@@ -46,7 +44,15 @@ uint8_t  mode   = 2, // Current animation effect
          leftOff = 7, // Position of spinny eyes
          rightOff = 2;
 
-
+uint8_t animation_pool[] {
+SPARKS_ANIM,
+SPINNY_ANIM,
+GOOGLY_ANIM,
+LARSON_SCANNER,
+HALF_BLINK_ANIM,
+FLASH_ANIM,
+COMET_ANIM,
+};
 uint8_t current_animation = 1;
 uint32_t animation_frame = 0;
 uint32_t animation_color  = 0xFF0000; // Start red
@@ -73,7 +79,7 @@ uint32_t rez_range = 256*3;
 
 uint8_t testpos = 0;
 
-uint32_t prevTime;
+uint32_t nextModeChange;
 
 int32_t hires_pos = 0, // 256x actual pos so we can fake floats
   inertia = 0,
@@ -162,14 +168,32 @@ void setup() {
   randomSeed(analogRead(0)); // Seed the random number generator with some noise off pin 0
   pixels.begin();
   pixels.setBrightness(5); // 1/3 brightness (85)
-  prevTime = millis();
-  last_button_change = prevTime;
+  nextModeChange = millis();
+  last_button_change = nextModeChange;
 
   */
 }
 
 void loop() {
-  UpdateAnimation();
+  unsigned long now = millis();
+
+  if (GetButtonState()) {
+    SolidRing(0x222222, true);
+    delay(130);
+    SolidRing(0, true);
+    nextModeChange =  now; // immediately jump to next mode
+  }
+
+
+  if((now > nextModeChange) ) {      // Every 8 seconds... change modes
+    mode++;                        // Next mode
+    if(mode > sizeof( animation_pool)) {       mode = 0;}                // End of modes?
+    NextColor(); // change to randomly pick a color
+    nextModeChange = now + ANIM_DURATION;
+    StartAnimation(animation_pool[mode]);
+  }
+
+    UpdateAnimation();
 }
 
 // Replace regular delay() with somethat can run background process
@@ -262,53 +286,3 @@ D: B
 E: A
 F: 9
 */
-
-
-boolean GetButtonState(){
-  // globals:
-  // last_button_state
-
-  boolean retVal = false;
-
-#if SWITCH_STYLE == VIBRATION
-    retVal = last_button_state;
-    last_button_state = false;
-
-
-#else
-// no inputs - everything is global
-
-  unsigned long now = millis();
-
-
-    if (digitalRead(BUTTON_PIN) == HIGH){
-
-      button_state = 1;
-    } else {
-      button_state = 0;
-
-    }
-
-    if(button_state == prev_button_state){
-      if (now - button_state_start_time > BUTTON_BOUNCE_TIME){
-        // button is stable: update
-        if (button_state){ // button pressed
-          if (button_seen_up){
-            // new press - actually do something
-            retVal =  true;
-
-            button_seen_up  = 0;
-          }
-        } else { // but not pressed:
-          button_seen_up =  1;
-        }
-      }
-
-    } else { // button state changed
-      prev_button_state = button_state;
-      button_state_start_time = now;
-
-    }
-#endif
-  return retVal;
-}

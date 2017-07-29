@@ -10,6 +10,11 @@
 #define MAX_PIXELS RING_SIZE*2
 #define NEOPIXEL_PIN 8
 
+#define BUTTON_PIN 3
+#define SWITCH_STYLE MOMENTARY
+// Switch styles will be MOMENTARY | VIBRATION
+//
+
 // NeoPixel Ring Animations:
 #define SPARKS_ANIM 0
 #define SPINNY_ANIM 1
