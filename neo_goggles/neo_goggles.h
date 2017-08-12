@@ -6,8 +6,12 @@
  */
 
 // code compile-time options:
+
+// if true, compile in the flame effect:
 #define USE_FLAME false
-// if true, compile in the flame effect
+
+// How far to step around the color wheel when we change colors:
+#define COLOR_WHEEL_STEP 16
 
 // Describe the hardware:
 #define MOMENTARY 1
@@ -19,7 +23,7 @@
 
 #define RING_SIZE 16
 #define MAX_PIXELS RING_SIZE*2
-#define NEOPIXEL_PIN 8
+#define NEOPIXEL_PIN 0
 
 #define BUTTON_PIN 3
 
@@ -39,7 +43,7 @@
 // other animation Constants:
 #define FADE_LENGTH 5
 
-#define PRDBG
+// #define PRDBG
 // macros:
 // create Serial.print macros:
 #ifdef PRDBG

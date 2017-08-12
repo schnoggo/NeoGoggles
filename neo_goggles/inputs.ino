@@ -3,6 +3,28 @@
  */
 
 
+// set up hardware pins:
+/**
+ * Initalize the input pins paying attention to if we're on a trinket
+ *
+ * Note the numbering of analog pins: Pin 2 is Analog 1,
+ *  Pin 3 is Analog 3, Pin 4 is Analog 2.
+ *  For the Uno, the terms A1, A2, and A3 are mapped for you.
+ *  For ATtiny85's, they are not.
+ *  So for the pinMode calls, use the Pin number (stenciled on Trinket),
+ *  for analogRead, use the analog number.
+ *
+ */
+void SetHWPins(){
+//  #ifdef __AVR_ATtiny85_
+// apparently only needed for analog reads
+
+  pinMode(BUTTON_PIN, INPUT); // make this an input [ INPUT, OUTPUT, or INPUT_PULLUP
+
+ }
+
+
+
 void ClearButtonState(){
   button_state_start_time = millis(); // reset the stablility timer
   current_button_state = false;

@@ -52,11 +52,14 @@ COMET_ANIM,
 
 
 };
+// Color and animation stuff:
 uint8_t current_animation = 1;
 uint32_t animation_frame = 0;
 uint32_t animation_color  = 0xFF0000; // Start red
-uint32_t palette[FADE_LENGTH + 1]; // array of color for animations (fades)
+uint32_t palette[2][FADE_LENGTH + 1]; // array of color for animations (fades)
+
 boolean pixels_dirty =  true;
+uint8_t color_wheel_position = 0;
 
 uint8_t seen_button_up = 1; //1:button has been up, 0 waiting for up
 uint8_t last_button_state = 0;
@@ -150,14 +153,15 @@ void setup() {
   // set up neopixel ring:
   pixels.begin();
   pixels.setBrightness(80);
-  SetAnimationColor(0x00FF00);
+  SetAnimationColor(0);
   SolidRing(0x222222, true);
   delay(500);
 
   dprintln("Solid called");
     StartAnimation(animation_pool[0]); // first animation in animation pool
-/*
   pinMode(BUTTON_PIN, INPUT); // make this an input
+/*
+
   digitalWrite(BUTTON_PIN, HIGH); // ...with a pullup resistor
   randomSeed(analogRead(0)); // Seed the random number generator with some noise off pin 0
   pixels.begin();
