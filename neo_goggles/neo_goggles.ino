@@ -17,7 +17,7 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 
 //Adafruit_NeoPixel pixels = Adafruit_NeoPixel(32, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS + WHITE_PIXELS +1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 
 
@@ -145,6 +145,7 @@ struct flame_element{
 
 
 void setup() {
+  SetHWPins(); // set pin modes (needed for trinket)
 #ifdef PRDBG
 	Serial.begin(9600);
 #endif
@@ -152,14 +153,17 @@ void setup() {
   dprintln("START");
   // set up neopixel ring:
   pixels.begin();
-  pixels.setBrightness(80);
+  pixels.setBrightness(100); // was 80
   SetAnimationColor(0);
-  SolidRing(0x222222, true);
-  delay(500);
+  SolidRing(pixels.Color(0,255,0), true);
+  pixels.setPixelColor(WHITE_PIXEL_START, pixels.Color(0,0,255));
+  pixels.setPixelColor(WHITE_PIXEL_START + 1,  pixels.Color(0,0,255));
+  pixels.show();
+  delay(100);
 
   dprintln("Solid called");
     StartAnimation(animation_pool[0]); // first animation in animation pool
-  pinMode(BUTTON_PIN, INPUT); // make this an input
+
 /*
 
   digitalWrite(BUTTON_PIN, HIGH); // ...with a pullup resistor
@@ -193,10 +197,12 @@ void BackgroundDelay(unsigned long delay_milliseconds){
     unsigned long now = millis();
     while ((now + delay_milliseconds) > millis()){
       UpdateButtonState();
+
       if (GetButtonState()){
         SolidRing(0x2222FF, true);
         delay(130);
         SolidRing(0, true);
+
         nextModeChange = now; // immediately jump to next mode
 
       }

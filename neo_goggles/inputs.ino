@@ -41,11 +41,15 @@ unsigned long now = millis();
   last_button_state = false;
 #else
 
-  if (digitalRead(BUTTON_PIN) == HIGH){
+  if (digitalRead(BUTTON_PIN) == LOW){
     hardware_button_state = 1;
   } else {
      hardware_button_state = 0;
   }
+
+    delay(40);
+
+
   if(hardware_button_state == prev_button_state){ // state is stable over multiple reads
     if (now - button_state_start_time > BUTTON_BOUNCE_TIME){ // is it stable over time?
       // button is stable: update global information

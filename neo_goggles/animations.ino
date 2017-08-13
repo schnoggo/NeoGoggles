@@ -248,6 +248,7 @@ break;
     pixels.show();
     pixels_dirty = false;
   }
+
 }
 
 /**

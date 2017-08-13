@@ -25,8 +25,9 @@
 #define MAX_PIXELS RING_SIZE*2
 #define NEOPIXEL_PIN 0
 
-#define BUTTON_PIN 3
-
+#define BUTTON_PIN 4
+#define WHITE_PIXEL_START MAX_PIXELS
+#define WHITE_PIXELS 1
 //
 
 // NeoPixel Ring Animations:
