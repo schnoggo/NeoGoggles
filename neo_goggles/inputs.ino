@@ -20,6 +20,7 @@ void SetHWPins(){
 // apparently only needed for analog reads
 
   pinMode(BUTTON_PIN, INPUT); // make this an input [ INPUT, OUTPUT, or INPUT_PULLUP
+  pinMode(VIBRATION_PIN, INPUT);
 
  }
 
@@ -34,20 +35,42 @@ void ClearButtonState(){
 
 void UpdateButtonState(){
 // globals:
+// button_state_start_time
+// current_button_state
+// prev_button_state
+// button_seen_up
+//
+// For latching shake sensor (vibration switch)
+//  shaking_latch_release
+//  shaking
 unsigned long now = millis();
 
-#if SWITCH_STYLE == VIBRATION
-//  retVal = last_button_state;
-  last_button_state = false;
-#else
+#ifdef VIBRATION_PIN
+//  retVal = shaking;
 
-  if (digitalRead(BUTTON_PIN) == LOW){
+  // only update state if latching duration has expired
+  if (shaking_latch_release <= now ) { // latch duration is up
+      if (digitalRead(BUTTON_PIN) == HIGH){
+        shaking = true;
+        new_shake = true;
+        shaking_latch_release = now + SHAKING_LATCH_DURATION;
+      } else {
+        shaking = false;
+      }
+  } else {
+      shaking = false;
+  }
+
+#endif
+
+#ifdef BUTTON_PIN
+  if (digitalRead(BUTTON_PIN) == HIGH){
     hardware_button_state = 1;
   } else {
      hardware_button_state = 0;
   }
 
-    delay(40);
+  //  delay(40);
 
 
   if(hardware_button_state == prev_button_state){ // state is stable over multiple reads
@@ -93,4 +116,14 @@ unsigned long now = millis();
     ClearButtonState();
    }
    return retVal;
+ }
+
+ boolean GetShakeState(){
+   // globals:
+   // shaking
+   // new_shake
+   boolean retVal = new_shake;
+   new_shake = false;
+   return retVal;
+
  }

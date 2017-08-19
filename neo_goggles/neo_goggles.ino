@@ -61,20 +61,29 @@ uint32_t palette[2][FADE_LENGTH + 1]; // array of color for animations (fades)
 boolean pixels_dirty =  true;
 uint8_t color_wheel_position = 0;
 
+#ifdef BUTTON_PIN
+// momentary switch:
 uint8_t seen_button_up = 1; //1:button has been up, 0 waiting for up
-uint8_t last_button_state = 0;
-uint32_t last_button_change = 0;
-#define bounce_window 12 //  milliseconds to count as stable
-uint8_t brightness_mode = 3; //0-5 levels of brightness. 0 = pulse (sleep) mode
-
 uint8_t hardware_button_state = 0;
 uint8_t prev_button_state = 0xFF;
 boolean button_seen_up = false;
 unsigned long button_state_start_time = 0;
-#define BUTTON_BOUNCE_TIME 30
+#endif
+#define bounce_window 12 //  milliseconds to count as stable
 
+
+uint8_t brightness_mode = 3; //0-5 levels of brightness. 0 = pulse (sleep) mode
+
+
+#define BUTTON_BOUNCE_TIME 30
+uint32_t last_button_change = 0;
 boolean current_button_state = false;
 
+// vibration sensor shake trigger:
+boolean shaking = false;
+boolean new_shake = false;
+uint32_t shaking_latch_release = 0;
+#define SHAKING_LATCH_DURATION 1500
 
 uint32_t rez_range = 256*3;
 uint8_t testpos = 0;
@@ -183,7 +192,7 @@ void loop() {
   if((now > nextModeChange) ) {      // Every 8 seconds... change modes
     mode++;                        // Next mode
     if(mode >= sizeof( animation_pool)) { mode = 0;} // End of available animations?
-    NextColor(); // change to randomly pick a color
+    NextColor(); // advence to next color in wheel
     nextModeChange = now + ANIM_DURATION;
     dprint("new mode: ");
     dprintln(mode);
@@ -196,14 +205,21 @@ void loop() {
 void BackgroundDelay(unsigned long delay_milliseconds){
     unsigned long now = millis();
     while ((now + delay_milliseconds) > millis()){
-      UpdateButtonState();
+      UpdateButtonState(); // updates all inputs
+  if (GetShakeState()) {
+        StartAnimation(GOOGLY_ANIM);
+      }
 
       if (GetButtonState()){
+        /*
         SolidRing(0x2222FF, true);
         delay(130);
         SolidRing(0, true);
+        */
+        NextColor();
+        StartAnimation(animation_pool[mode]);
 
-        nextModeChange = now; // immediately jump to next mode
+      //  nextModeChange = now; // immediately jump to next mode
 
       }
 

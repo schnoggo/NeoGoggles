@@ -14,20 +14,21 @@
 #define COLOR_WHEEL_STEP 16
 
 // Describe the hardware:
-#define MOMENTARY 1
-#define VIBRATION 2
-#define SWITCH_STYLE MOMENTARY
-// Switch styles will be MOMENTARY | VIBRATION (Don't use 0 for definitions)
-
-
-
+// Size of neopixel ring:
 #define RING_SIZE 16
 #define MAX_PIXELS RING_SIZE*2
+// Data pin for NeoPixels:
 #define NEOPIXEL_PIN 0
-
-#define BUTTON_PIN 4
 #define WHITE_PIXEL_START MAX_PIXELS
+// How many white pixel for backlight
 #define WHITE_PIXELS 1
+
+// Input pins for the button and vibration sensor
+// comment out if not available on these goggles
+#define BUTTON_PIN 4
+#define VIBRATION_PIN 1
+
+
 //
 
 // NeoPixel Ring Animations:
