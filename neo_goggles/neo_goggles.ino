@@ -44,7 +44,7 @@ FLAME_ANIM,
 #endif
 //SPARKS_ANIM,
  SPINNY_ANIM,
-GOOGLY_ANIM,
+//GOOGLY_ANIM,
 COMET_ANIM,
 // LARSON_SCANNER,
 //HALF_BLINK_ANIM,
@@ -206,7 +206,7 @@ void BackgroundDelay(unsigned long delay_milliseconds){
     unsigned long now = millis();
     while ((now + delay_milliseconds) > millis()){
       UpdateButtonState(); // updates all inputs
-  if (GetShakeState()) {
+      if (GetShakeState()) {
         StartAnimation(GOOGLY_ANIM);
       }
 
