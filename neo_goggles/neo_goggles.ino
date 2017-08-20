@@ -164,6 +164,7 @@ void setup() {
   delay(100);
 */
   dprintln("Solid called");
+    SetBacklight(255, false);
     StartAnimation(animation_pool[0]); // first animation in animation pool
 
 
@@ -205,10 +206,6 @@ void BackgroundDelay(unsigned long delay_milliseconds){
       //  nextModeChange = now; // immediately jump to next mode
 
       }
-      SetBacklight(255, true);
-      delay(130);
-      SetBacklight(0, true);
-      delay(130);
     }
 }
 
