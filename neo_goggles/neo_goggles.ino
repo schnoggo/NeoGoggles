@@ -17,21 +17,18 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 
 //Adafruit_NeoPixel pixels = Adafruit_NeoPixel(32, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS + WHITE_PIXELS +1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS + BACKLIGHT_PIXELS , NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 
 
 #define SLEEP_BRIGHTNESS 13 // maximum brightness in sleep mode
-#define ANIM_DURATION 12000 // 12 seconds on each effect
+#define ANIM_DURATION 8000 // 12 seconds on each effect
 
 // Global reusable variables so we don't allocate inside functions and loops
 long rgb[3]; // generic RGB values - long so we can calculate and scale
 uint8_t  i; // generic index
 uint32_t this_color = 0; // temporary color "register" so we can reuse the RAM
 uint8_t  ring_pos = 8; // position on the ring (usually just one eye)
-byte acc; // re-usable signed 8-bit "accumulator"
-
-
 
 uint8_t  mode   = 0, // Current animation effect
 // "left" is closest to cpu
@@ -72,9 +69,6 @@ unsigned long button_state_start_time = 0;
 #define bounce_window 12 //  milliseconds to count as stable
 
 
-uint8_t brightness_mode = 3; //0-5 levels of brightness. 0 = pulse (sleep) mode
-
-
 #define BUTTON_BOUNCE_TIME 30
 uint32_t last_button_change = 0;
 boolean current_button_state = false;
@@ -99,14 +93,12 @@ int32_t hires_pos = 0, // 256x actual pos so we can fake floats
 #define friction  230 // 90% of 256 = 10% drag
 #define spring_constant 92 // 36% of 256
 #define denom 256 // binary fraction time!
+#/*
 const uint8_t vFlip[]{
   0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1,
   0x0, 0xF, 0xE, 0xD, 0xC, 0xB, 0xA, 0x9
 }; //hard-coded for 16 pixel rings
-
-const uint8_t brightnessValues[] PROGMEM ={
-  0x00, 0x07, 0x20, 0x40, 0x80, 0xFF
-};
+*/
 
 #if USE_FLAME
 
@@ -123,7 +115,7 @@ struct flame_element{
   int new_brightness = 0;
   uint8_t scaleD_rgb[3];
 
-#endif
+
 
  #define SCALERVAL 256*3
  const int flamecolors[22][3] = {
@@ -151,7 +143,7 @@ struct flame_element{
 { SCALERVAL,  SCALERVAL*.3,  SCALERVAL*.5}
 };
 
-
+#endif
 
 void setup() {
   SetHWPins(); // set pin modes (needed for trinket)
@@ -162,32 +154,23 @@ void setup() {
   dprintln("START");
   // set up neopixel ring:
   pixels.begin();
-  pixels.setBrightness(100); // was 80
+  pixels.setBrightness(80); // was 80
+  /*
   SetAnimationColor(0);
   SolidRing(pixels.Color(0,255,0), true);
-  pixels.setPixelColor(WHITE_PIXEL_START, pixels.Color(0,0,255));
-  pixels.setPixelColor(WHITE_PIXEL_START + 1,  pixels.Color(0,0,255));
+  pixels.setPixelColor(WHITE_PIXEL_START, pixels.Color(255,255,255));
+  pixels.setPixelColor(WHITE_PIXEL_START + 1,  pixels.Color(255,255,255));
   pixels.show();
   delay(100);
-
+*/
   dprintln("Solid called");
     StartAnimation(animation_pool[0]); // first animation in animation pool
 
-/*
 
-  digitalWrite(BUTTON_PIN, HIGH); // ...with a pullup resistor
-  randomSeed(analogRead(0)); // Seed the random number generator with some noise off pin 0
-  pixels.begin();
-  pixels.setBrightness(5); // 1/3 brightness (85)
-  nextModeChange = millis();
-  last_button_change = nextModeChange;
-
-  */
 }
 
 void loop() {
   unsigned long now = millis();
-
 
   if((now > nextModeChange) ) {      // Every 8 seconds... change modes
     mode++;                        // Next mode
@@ -201,7 +184,7 @@ void loop() {
     UpdateAnimation();
 }
 
-// Replace regular delay() with somethat can run background process
+// Replace regular delay() with something that can run background process
 void BackgroundDelay(unsigned long delay_milliseconds){
     unsigned long now = millis();
     while ((now + delay_milliseconds) > millis()){
@@ -222,7 +205,10 @@ void BackgroundDelay(unsigned long delay_milliseconds){
       //  nextModeChange = now; // immediately jump to next mode
 
       }
-
+      SetBacklight(255, true);
+      delay(130);
+      SetBacklight(0, true);
+      delay(130);
     }
 }
 

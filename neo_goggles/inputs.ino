@@ -103,7 +103,7 @@ unsigned long now = millis();
 
 /**
  * Returns the current computed state of the button and
- * resets the system
+ * resets the button state
  *
  * @param Boolean current state of debounced (or latched) button
  */

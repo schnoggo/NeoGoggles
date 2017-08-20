@@ -252,7 +252,7 @@ break;
 }
 
 /**
- * Light an LED at specicied location on both eyes
+ * Light an LED at specified location on both eyes
  * acccounting for rotation, offsets and reflection
  *
  * @param uint8_t position which pixel to light up
@@ -313,12 +313,8 @@ uint8_t OffsetRightPos(uint8_t v_pos){
    return (RING_SIZE + NormalizeRingPos( v_pos + rightOff));
 }
 
-
-// leftOff position of
-
-
 /**
- * Turn all the LEDs off
+ * Turn all ring LEDs off
  * @param boolean show true = display immediately. false = don't call show()
  */
 void ClearRings(boolean show){
@@ -430,21 +426,12 @@ uint8_t RingDistance(int8_t pos1, int8_t pos2){
 
   // fill in palette with faded values:
     for(i=0; i<FADE_LENGTH; i++){
-        dprint("i: ");
-        dprint(i);
-        dprint(",   ");
       palette[palette_index][i] = pixels.Color(rgb[0], rgb[1], rgb[2]); // base color on current split-up color channels
       // now fade it for next slot in array:
       for(channel=0; channel<3; channel++){ // step through RGB channels
-        dprint(channel);
-        dprint(": ");
         channel_value = rgb[channel]; // copy it to an int for bigger math
         rgb[channel] = (channel_value * 40) /  100;
-        dprint(rgb[channel]);
-        dprint(",  ");
       }
-
-    dprintln();
     }
     palette_index++;
     wheel_index = wheel_index - 40; // 30 works for sure
@@ -464,6 +451,7 @@ uint32_t NeoWheel(byte WheelPos) {
     packed color value as used in Adafruit libraries
 */
 
+/*
   if(WheelPos < 85) {
    return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
   } else if(WheelPos < 170) {
@@ -472,5 +460,48 @@ uint32_t NeoWheel(byte WheelPos) {
   } else {
    WheelPos -= 170;
    return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  */
+  uint8_t red = 0;
+  uint8_t green = 0;
+  uint8_t blue = 0;
+  if(WheelPos < 85) {
+  //  return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+    red = WheelPos * 3;
+    green = 255 - WheelPos;
+
+  } else if(WheelPos < 170) {
+    WheelPos -= 85;
+    //  return pixels.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+    red = 255 - WheelPos * 3;
+    blue = WheelPos * 3;
+
+  } else {
+    WheelPos -= 170;
+    // return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+    green = WheelPos * 3;
+    blue = 255 - WheelPos * 3;
+  }
+  return pixels.Color(red, green, blue);
+}
+
+/**
+ * Turns on the backlight
+ * This version is 256-based.
+ * Update to 768 when time allows
+ *
+ * @param uint8_t overall brightness
+ */
+void SetBacklight( uint8_t brightness, boolean show){
+  // globals:
+  // pixels - Adafruit neopixel object
+  // this_color - temporary color value
+
+  uint8_t white_pos = 0;
+  this_color = pixels.Color(brightness,brightness,brightness);
+  pixels.setPixelColor( BACKLIGHT_PIXEL_START, this_color );
+  pixels.setPixelColor( BACKLIGHT_PIXEL_START - 1, this_color );
+  if (show){
+    pixels.show();
   }
 }
