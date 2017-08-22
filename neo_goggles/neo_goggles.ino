@@ -34,7 +34,7 @@ uint8_t  mode   = 0, // Current animation effect
 // "left" is closest to cpu
          leftOff = 7, // Position of spinny eyes
          rightOff = 2;
-
+boolean auto_advance =  true;
 uint8_t animation_pool[] {
 #if USE_FLAME
 FLAME_ANIM,
@@ -176,7 +176,9 @@ void loop() {
   if((now > nextModeChange) ) {      // Every 8 seconds... change modes
     mode++;                        // Next mode
     if(mode >= sizeof( animation_pool)) { mode = 0;} // End of available animations?
-    NextColor(); // advence to next color in wheel
+    if (auto_advance) {
+      NextColor(); // advence to next color in wheel
+    }
     nextModeChange = now + ANIM_DURATION;
     dprint("new mode: ");
     dprintln(mode);
@@ -200,6 +202,7 @@ void BackgroundDelay(unsigned long delay_milliseconds){
         delay(130);
         SolidRing(0, true);
         */
+       auto_advance = false; // if use sets color, lock it in
         NextColor();
         StartAnimation(animation_pool[mode]);
 
