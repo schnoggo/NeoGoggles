@@ -26,7 +26,7 @@ void StartAnimation(uint8_t which_animation){
 
   switch (which_animation){
     case SPARKS_ANIM:
-
+      ClearRings(false);
     break;
 
     case SOLID_ANIM:
@@ -54,7 +54,7 @@ switch(current_animation) {
 
 
 case COMET_ANIM:
-  // streak around the ring with current color
+  //  2 dots with tails streak around the ring with current color
   ClearRings(false);
   for(uint8_t fade_level=0; fade_level<5; fade_level++){
     DrawRingPixel(animation_frame - fade_level , fade_level, true, 2, true);
@@ -68,11 +68,14 @@ break;
  case SPARKS_ANIM: // Random sparks - just one LED on at a time
  // ======================================================
   i = random(MAX_PIXELS);
- // pixels.setPixelColor(i, animation_color);
+
   pixels.setPixelColor(i, pixels.Color(SteppedColor(), SteppedColor(), SteppedColor() ));
   pixels.show();
   BackgroundDelay(10);
   pixels.setPixelColor(i, 0);
+
+
+
   frame_duration = 0;
   pixels_dirty =  false;
   break;
@@ -93,7 +96,7 @@ break;
   break;
 
 */
-  case SPINNY_ANIM: // Spinny wheels (4 LEDs on at a time)
+  case SPINNY_ANIM: // Spinny wheels (4 pointed star)
   // ======================================================
     ClearRings(false);
     DrawRingPixel(animation_frame  , 0, true, 4 , false);

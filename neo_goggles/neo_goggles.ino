@@ -39,7 +39,7 @@ uint8_t animation_pool[] {
 #if USE_FLAME
 FLAME_ANIM,
 #endif
-//SPARKS_ANIM,
+ SPARKS_ANIM,
  SPINNY_ANIM,
 //GOOGLY_ANIM,
 COMET_ANIM,
@@ -193,7 +193,9 @@ void BackgroundDelay(unsigned long delay_milliseconds){
     while ((now + delay_milliseconds) > millis()){
       UpdateButtonState(); // updates all inputs
       if (GetShakeState()) {
+        nextModeChange = now + ANIM_DURATION;
         StartAnimation(GOOGLY_ANIM);
+      //  break;
       }
 
       if (GetButtonState()){
@@ -207,7 +209,7 @@ void BackgroundDelay(unsigned long delay_milliseconds){
         StartAnimation(animation_pool[mode]);
 
       //  nextModeChange = now; // immediately jump to next mode
-
+      //  break;
       }
     }
 }
