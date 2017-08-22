@@ -22,7 +22,7 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS + BACKLIGHT_PIXELS , NEO
 
 
 #define SLEEP_BRIGHTNESS 13 // maximum brightness in sleep mode
-#define ANIM_DURATION 8000 // 12 seconds on each effect
+#define ANIM_DURATION 8000 // 8 seconds on each effect
 
 // Global reusable variables so we don't allocate inside functions and loops
 long rgb[3]; // generic RGB values - long so we can calculate and scale
@@ -44,13 +44,13 @@ FLAME_ANIM,
 //GOOGLY_ANIM,
 COMET_ANIM,
 // LARSON_SCANNER,
-//HALF_BLINK_ANIM,
+HALF_BLINK_ANIM,
 //FLASH_ANIM,
 
 
 };
 // Color and animation stuff:
-uint8_t current_animation = 1;
+uint8_t current_animation = SPARKS_ANIM;
 uint32_t animation_frame = 0;
 uint32_t animation_color  = 0xFF0000; // Start red
 uint32_t palette[2][FADE_LENGTH + 1]; // array of color for animations (fades)
@@ -81,7 +81,7 @@ uint32_t shaking_latch_release = 0;
 
 uint32_t rez_range = 256*3;
 uint8_t testpos = 0;
-uint32_t nextModeChange;
+uint32_t nextModeChange = 0;
 int32_t hires_pos = 0, // 256x actual pos so we can fake floats
   inertia = 0,
   moment =0,
@@ -114,8 +114,6 @@ struct flame_element{
 
   int new_brightness = 0;
   uint8_t scaleD_rgb[3];
-
-
 
  #define SCALERVAL 256*3
  const int flamecolors[22][3] = {
@@ -150,7 +148,7 @@ void setup() {
 #ifdef PRDBG
 	Serial.begin(9600);
 #endif
-  delay(200);
+  //delay(200);
   dprintln("START");
   // set up neopixel ring:
   pixels.begin();
@@ -164,8 +162,7 @@ void setup() {
   delay(100);
 */
   dprintln("Solid called");
-    SetBacklight(255, false);
-    StartAnimation(animation_pool[0]); // first animation in animation pool
+    SetBacklight(255);
 
 
 }

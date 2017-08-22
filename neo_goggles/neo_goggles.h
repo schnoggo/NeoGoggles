@@ -21,7 +21,7 @@
 #define NEOPIXEL_PIN 0
 #define BACKLIGHT_PIXEL_START MAX_PIXELS
 // How many white pixel for backlight
-#define BACKLIGHT_PIXELS 2
+#define BACKLIGHT_PIXELS 1
 
 // Input pins for the button and vibration sensor
 // comment out if not available on these goggles

@@ -69,7 +69,7 @@ break;
  // ======================================================
   i = random(MAX_PIXELS);
 
-  pixels.setPixelColor(i, pixels.Color(SteppedColor(), SteppedColor(), SteppedColor() ));
+  pixels.setPixelColor(i, pixels.Color(RandomSteppedColor(), RandomSteppedColor(), RandomSteppedColor() ));
   pixels.show();
   BackgroundDelay(10);
   pixels.setPixelColor(i, 0);
@@ -168,10 +168,9 @@ break;
 
   break;
 */
-/*
+
   case HALF_BLINK_ANIM:
-
-
+/*
   for(i=0; i<MAX_PIXELS; i=i+1){ // light every other pixel
       if ((i%2) == (byte) animation_frame ){
     pixels.setPixelColor(i, animation_color);
@@ -190,8 +189,32 @@ break;
       frame_duration = 200;
       pixels_dirty =  true;
   }
+  */
+
+  SolidRing(FadedColor(0, 3), false);
+  DrawRingPixel(animation_frame  , 1 , true, 8, false);
+  /*
+  * @param uint8_t position which pixel to light up
+  * @param palette_index index of this color in the palette
+  * @param boolean reflection true = mirror to other eye. False copy to other eye
+  * @param multiple how many times to draw (recommended values: 1, 2, 4, 8)
+  * @param boolean true = alternat color with secondary palette
+  * */
+/*
+  for(i=0; i<MAX_PIXELS; i=i+1){ // light every other pixel
+      if ((i%2) == (byte) animation_frame ){
+    pixels.setPixelColor(i, animation_color);
+
+  } else {
+    pixels.setPixelColor(i, pixels.Color(0,40,0));
+
+  }
+  */
+  if (animation_frame > 0){ animation_frame = 0;}
+
+
   break;
-*/
+
 #if USE_FLAME
   case FLAME_ANIM: // fire
    InitFlames();
@@ -336,11 +359,6 @@ void SolidRing(uint32_t c, boolean show){
     }
 }
 
-void FlashRing(){
-  SolidRing(0x222222, true);
-  BackgroundDelay(100);
-  SolidRing(0, true);
-}
 /**
  * Specify the animation color (in terms of color wheel index)
  * @param uint8_t new_color color wheen index (8 bit)
@@ -358,18 +376,12 @@ void SetAnimationColor(uint8_t new_color){
 }
 void NextColor(){
   // globals:
-  // animation_color
-/*
-        animation_color >>= 8;                 // Next color R->G->B
-      if(!animation_color) animation_color = 0xFF0000; // Reset to red
-*/
+  // color_wheel_position
   color_wheel_position += COLOR_WHEEL_STEP;
-//  if (color_wheel_position > 255) { color_wheel_position = 0;} //no need to wrap with 8-bit var
   SetAnimationColor(color_wheel_position);
 }
 
 uint8_t NormalizeRingPos(uint8_t realPos){
-
   while (realPos < 0) { realPos += 16;}
   while (realPos > 15) { realPos -= 16; }
   return realPos;
@@ -386,7 +398,7 @@ uint8_t RingDistance(int8_t pos1, int8_t pos2){
   return retVal;
 }
 
- uint8_t SteppedColor(){
+ uint8_t RandomSteppedColor(){
    // return a non-continuous value for a color axis
    return random(4)*64;
  }
@@ -495,7 +507,7 @@ uint32_t NeoWheel(byte WheelPos) {
  *
  * @param uint8_t overall brightness
  */
-void SetBacklight( uint8_t brightness, boolean show){
+void SetBacklight( uint8_t brightness){
   // globals:
   // pixels - Adafruit neopixel object
   // this_color - temporary color value
@@ -503,8 +515,6 @@ void SetBacklight( uint8_t brightness, boolean show){
   uint8_t white_pos = 0;
   this_color = pixels.Color(brightness,brightness,brightness);
   pixels.setPixelColor( BACKLIGHT_PIXEL_START, this_color );
-  pixels.setPixelColor( BACKLIGHT_PIXEL_START - 1, this_color );
-  if (show){
-    pixels.show();
-  }
+//  pixels.setPixelColor( BACKLIGHT_PIXEL_START - 1, this_color );
+
 }
