@@ -49,7 +49,9 @@ void UpdateAnimation(){
 // animation_color
 
 uint16_t frame_duration = 200;
-uint8_t delta = 0;
+int delta = 0;
+int calc_pos = 0;
+uint32_t this_color = 0;
 switch(current_animation) {
 
 case JUST_ZERO:
@@ -101,35 +103,37 @@ break;
 
     case LARSON_SCANNER: // larson scanner:
 // ======================================================
-// actually, just a spinner in this version
-/*
-
-for(pixel_index = 0; pixel_index <= 6;  pixel_index++) {
-  for (uint8_t j = 0; j <2; j++){
-    strip_pos = neopixel_slices[(pixel_index*2) + j];
-    if (strip_pos < 0xff){
-      neopixel_dirty = true;
-      // right-hand ring
-      if (this_frame == pixel_index) {
-        strip.setPixelColor(strip_pos, strip.Color(128,128,128));
+    ClearRings(false);
+  delta = 1;
+  if (animation_frame < (RING_SIZE )){
+      if (animation_frame < RING_SIZE / 2){
+        calc_pos = horiz_to_pos[animation_frame][0];
+        this_color = FadedColor(0, 0); // gives us our 32-bit color
+        pixels.setPixelColor( OffsetLeftPos(calc_pos) , this_color); // left eye
       } else {
-        strip.setPixelColor(strip_pos, strip.Color(0,0,0)); // make dark
-      }
+        calc_pos = horiz_to_pos[animation_frame - (RING_SIZE / 2)][0];
+        this_color = FadedColor(0, 0); // gives us our 32-bit color
+        pixels.setPixelColor( OffsetRightPos(calc_pos) , this_color); // right eye
 
-      // left-hand ring
-      if (this_frame == (6 - pixel_index)) {
-        strip.setPixelColor(strip_pos + 12, strip.Color(128,128,128));
-      } else {
-        strip.setPixelColor(strip_pos + 12, strip.Color(0,0,0)); // make dark
       }
+  } else {
+    if (animation_frame < ((RING_SIZE / 2) *3) ){
+      calc_pos = horiz_to_pos[((RING_SIZE / 2) *3) - animation_frame][0];
+      this_color = FadedColor(0, 0); // gives us our 32-bit color
+      pixels.setPixelColor( OffsetRightPos(calc_pos) , this_color); // left eye
+    } else {
+      calc_pos = horiz_to_pos[(RING_SIZE * 2) - animation_frame][0];
+      this_color = FadedColor(0, 0); // gives us our 32-bit color
+      pixels.setPixelColor( OffsetLeftPos(calc_pos) , this_color); // right eye
+
     }
-}
-}
-  testpos++;
-  if (testpos>15){testpos=0;}
-  BackgroundDelay(60);
-  pixels.show();
-*/
+
+  }
+
+
+    if ((++animation_frame) >= (RING_SIZE  * 2 ) ) {animation_frame = 0;}
+    frame_duration = 1000;
+    pixels_dirty =  true;
   break;
 
 

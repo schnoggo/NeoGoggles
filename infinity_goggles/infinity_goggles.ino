@@ -22,7 +22,7 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_PIXELS , NEOPIXEL_PIN, NEO_GRB 
 
 
 #define SLEEP_BRIGHTNESS 13 // maximum brightness in sleep mode
-#define ANIM_DURATION 8000 // 8 seconds on each effect
+#define ANIM_DURATION 80000 // 8 seconds on each effect
 
 // Global reusable variables so we don't allocate inside functions and loops
 long rgb[3]; // generic RGB values - long so we can calculate and scale
@@ -39,7 +39,7 @@ uint8_t animation_pool[] {
 
 //JUST_ZERO,
  //SPARKS_ANIM,
- //SPINNY_ANIM,
+// SPINNY_ANIM,
 //GOOGLY_ANIM,
 //COMET_ANIM,
  LARSON_SCANNER,
@@ -98,7 +98,18 @@ const uint8_t vFlip[]{
   0x0, 0xF, 0xE, 0xD, 0xC, 0xB, 0xA, 0x9
 }; //hard-coded for 16 pixel rings
 */
-
+const uint8_t horiz_to_pos[10][2]{
+  {14, 15},
+  {13, 16},
+  {12, 17},
+  {11, 18},
+  {10, 19},
+  {9,  0},
+  {8,  1},
+  {7,  2},
+  {6,  3},
+  {5,  4}
+};
 #if USE_FLAME
 
 #define NUMBER_OF_FLAMES 5 // depends on number of neopixel triplets. 5 for 16 NeoPixel ring. 4 for 12 NeoPixel ring
