@@ -30,7 +30,7 @@
 #define FLASH_ANIM 5
 #define SOLID_ANIM 6
 #define COMET_ANIM 7
-#define FLAME_ANIM 99
+#define JUST_ZERO 8
 
 // other animation Constants:
 #define FADE_LENGTH 5

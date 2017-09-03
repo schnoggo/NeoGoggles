@@ -52,6 +52,12 @@ uint16_t frame_duration = 200;
 uint8_t delta = 0;
 switch(current_animation) {
 
+case JUST_ZERO:
+    ClearRings(false);
+      DrawRingPixel(0 , 1, false, 1, false);
+      pixels_dirty =  true;
+
+break;
 
 case COMET_ANIM:
   //  2 dots with tails streak around the ring with current color
@@ -76,23 +82,7 @@ break;
   frame_duration = 5;
   pixels_dirty =  true;
   break;
-/*
-  case FLASH_ANIM:
-  // blinky
-    this_color = animation_color;
-    if (1 == animation_frame){ this_color = 0; }
 
-      for(i=0; i<16; i++) { //count around the ring of pixels
-        pixels.setPixelColor( i, this_color); // First eye
-        pixels.setPixelColor(16 + i  , this_color); //
-      }
-
-    if ((++animation_frame)>1) {animation_frame = 0;}
-    frame_duration = 1000;
-    pixels_dirty =  true;
-  break;
-
-*/
   case SPINNY_ANIM: // Spinny wheels (4 pointed star)
   // ======================================================
   #define STAR_POINTS 5
@@ -108,23 +98,40 @@ break;
 
 
 
-/*
+
     case LARSON_SCANNER: // larson scanner:
 // ======================================================
 // actually, just a spinner in this version
-    for(i=0; i<16; i++) {
-    this_color = 0; // turn off non-selected pixels
-    if(testpos == i) {this_color = 0xFFFF00;} // 4 pixels on...
-    pixels.setPixelColor(  NormalizeRingPos(i+leftOff), this_color); // First eye
-    pixels.setPixelColor(16 + NormalizeRingPos(i+rightOff)  , this_color); // Second eye (flipped)
-  }
+/*
+
+for(pixel_index = 0; pixel_index <= 6;  pixel_index++) {
+  for (uint8_t j = 0; j <2; j++){
+    strip_pos = neopixel_slices[(pixel_index*2) + j];
+    if (strip_pos < 0xff){
+      neopixel_dirty = true;
+      // right-hand ring
+      if (this_frame == pixel_index) {
+        strip.setPixelColor(strip_pos, strip.Color(128,128,128));
+      } else {
+        strip.setPixelColor(strip_pos, strip.Color(0,0,0)); // make dark
+      }
+
+      // left-hand ring
+      if (this_frame == (6 - pixel_index)) {
+        strip.setPixelColor(strip_pos + 12, strip.Color(128,128,128));
+      } else {
+        strip.setPixelColor(strip_pos + 12, strip.Color(0,0,0)); // make dark
+      }
+    }
+}
+}
   testpos++;
   if (testpos>15){testpos=0;}
   BackgroundDelay(60);
   pixels.show();
-
-  break;
 */
+  break;
+
 
 
 

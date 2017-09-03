@@ -32,18 +32,17 @@ uint8_t  ring_pos = 8; // position on the ring (usually just one eye)
 
 uint8_t  mode   = 0, // Current animation effect
 // "left" is closest to cpu
-         leftOff = 7, // Position of spinny eyes
-         rightOff = 2;
+         leftOff = 0, // Position of spinny eyes
+         rightOff = 5;
 boolean auto_advance =  true;
 uint8_t animation_pool[] {
-#if USE_FLAME
-FLAME_ANIM,
-#endif
- SPARKS_ANIM,
- SPINNY_ANIM,
+
+//JUST_ZERO,
+ //SPARKS_ANIM,
+ //SPINNY_ANIM,
 //GOOGLY_ANIM,
-COMET_ANIM,
-// LARSON_SCANNER,
+//COMET_ANIM,
+ LARSON_SCANNER,
 //HALF_BLINK_ANIM,
 //FLASH_ANIM,
 
