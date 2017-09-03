@@ -105,26 +105,34 @@ break;
 // ======================================================
     ClearRings(false);
   delta = 1;
-  if (animation_frame < (RING_SIZE )){
-      if (animation_frame < RING_SIZE / 2){
+  if (animation_frame < (RING_SIZE )){ // 0 -19
+      if (animation_frame < RING_SIZE / 2){ //0-9
+        this_color = FadedColor(0, 0); // gives us our 32-bit color
         calc_pos = horiz_to_pos[animation_frame][0];
-        this_color = FadedColor(0, 0); // gives us our 32-bit color
         pixels.setPixelColor( OffsetLeftPos(calc_pos) , this_color); // left eye
-      } else {
-        calc_pos = horiz_to_pos[animation_frame - (RING_SIZE / 2)][0];
+        calc_pos = horiz_to_pos[animation_frame][1];
+        pixels.setPixelColor( OffsetLeftPos(calc_pos) , this_color); // left eye
+      } else { // 10 - 19
         this_color = FadedColor(0, 0); // gives us our 32-bit color
+        calc_pos = horiz_to_pos[animation_frame - (RING_SIZE / 2)][0];
         pixels.setPixelColor( OffsetRightPos(calc_pos) , this_color); // right eye
-
+        calc_pos = horiz_to_pos[animation_frame - (RING_SIZE / 2)][1];
+        pixels.setPixelColor( OffsetRightPos(calc_pos) , this_color); // right eye
       }
-  } else {
-    if (animation_frame < ((RING_SIZE / 2) *3) ){
-      calc_pos = horiz_to_pos[((RING_SIZE / 2) *3) - animation_frame][0];
+  } else { // 20 - 39
+    if (animation_frame < ((RING_SIZE / 2) *3) ){ // 20 -29
       this_color = FadedColor(0, 0); // gives us our 32-bit color
-      pixels.setPixelColor( OffsetRightPos(calc_pos) , this_color); // left eye
-    } else {
-      calc_pos = horiz_to_pos[(RING_SIZE * 2) - animation_frame][0];
+      calc_pos = horiz_to_pos[( ((RING_SIZE / 2) *3) -1 ) - animation_frame][0];
+      pixels.setPixelColor( OffsetRightPos(calc_pos) , this_color);
+      calc_pos = horiz_to_pos[( ((RING_SIZE / 2) *3) -1 ) - animation_frame][1];
+      pixels.setPixelColor( OffsetRightPos(calc_pos) , this_color);
+    } else { // 30 - 39
       this_color = FadedColor(0, 0); // gives us our 32-bit color
-      pixels.setPixelColor( OffsetLeftPos(calc_pos) , this_color); // right eye
+
+      calc_pos = horiz_to_pos[((RING_SIZE * 2) - 1) - animation_frame][0];
+      pixels.setPixelColor( OffsetLeftPos(calc_pos) , this_color);
+      calc_pos = horiz_to_pos[((RING_SIZE * 2) - 1) - animation_frame][1];
+      pixels.setPixelColor( OffsetLeftPos(calc_pos) , this_color);
 
     }
 
@@ -132,7 +140,7 @@ break;
 
 
     if ((++animation_frame) >= (RING_SIZE  * 2 ) ) {animation_frame = 0;}
-    frame_duration = 1000;
+    frame_duration = 80;
     pixels_dirty =  true;
   break;
 
