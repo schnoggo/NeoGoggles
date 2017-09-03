@@ -162,7 +162,7 @@ void setup() {
   delay(100);
 */
   dprintln("Solid called");
-    SetBacklight(255);
+    SetBacklight(160);
 
 
 }

@@ -73,11 +73,8 @@ break;
   pixels.show();
   BackgroundDelay(10);
   pixels.setPixelColor(i, 0);
-
-
-
-  frame_duration = 0;
-  pixels_dirty =  false;
+  frame_duration = 5;
+  pixels_dirty =  true;
   break;
 /*
   case FLASH_ANIM:
@@ -210,8 +207,8 @@ break;
 
   }
   */
-  if (animation_frame > 0){ animation_frame = 0;}
-
+  if (++animation_frame > 1){ animation_frame = 0;}
+  pixels_dirty = true;
 
   break;
 
